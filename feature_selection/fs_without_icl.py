@@ -5,6 +5,7 @@ import torch
 import tqdm
 import numpy as np
 from scipy import stats
+import atexit
 
 
 def get_feature_i(i):
@@ -19,8 +20,16 @@ def get_feature_i(i):
     return data1, data2
 
 
-expert_data = utils.generate_data(f'data/expert_data_{basic.env_name}.pt', c=basic.true_constraint_function, only_success=True)
-nominal_data = utils.generate_data(f'data/zero_data_{basic.env_name}.pt', c=basic.zero_constraint_function)
+atexit.register(utils.end_logging)
+utils.start_logging("%s/0_log_without_icl.txt" % basic.save_dir)
+
+
+if basic.env_name == 'highd':
+    print("Using saved expert data for highd")
+    expert_data = utils.generate_data(f'data/expert_data_{basic.env_name}.pt', c=basic.true_constraint_function, only_success=True)
+else:
+    expert_data = utils.generate_data(f'data/expert_data_{basic.env_name}_{basic.seed}.pt', c=basic.true_constraint_function, only_success=True)
+nominal_data = utils.generate_data(f'data/zero_data_{basic.env_name}_{basic.seed}.pt', c=basic.zero_constraint_function)
 
 items = []
 for i in tqdm.trange(basic.n_features):

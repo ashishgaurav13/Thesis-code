@@ -6,10 +6,17 @@ import tqdm
 import numpy as np
 from scipy import stats
 from skfeature.function.information_theoretical_based import CIFE, DISR, CMIM, MRMR
+import atexit
 
+atexit.register(utils.end_logging)
+utils.start_logging("%s/0_log_baseline_%s.txt" % (basic.save_dir, basic.args.baseline))
 
-expert_data = utils.generate_data(f'data/expert_data_{basic.env_name}.pt', c=basic.true_constraint_function, only_success=True)
-nominal_data = utils.generate_data(f'data/zero_data_{basic.env_name}.pt', c=basic.zero_constraint_function)
+if basic.env_name == 'highd':
+    print("Using saved expert data for highd")
+    expert_data = utils.generate_data(f'data/expert_data_{basic.env_name}.pt', c=basic.true_constraint_function, only_success=True)
+else:
+    expert_data = utils.generate_data(f'data/expert_data_{basic.env_name}_{basic.seed}.pt', c=basic.true_constraint_function, only_success=True)
+nominal_data = utils.generate_data(f'data/zero_data_{basic.env_name}_{basic.seed}.pt', c=basic.zero_constraint_function)
 
 data = []
 for S, A in expert_data:
